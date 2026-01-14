@@ -259,3 +259,64 @@ class InterfaceSupervision:
             width=15
         )
         btn_quitter.pack(side='right', padx=5)
+    
+    def connecter(self):
+        """Connecter à l'automate"""
+        ip = self.entry_ip.get()
+        
+        try:
+            client = snap7.client.Client()
+            client.connect(ip, 0, 1)
+            
+            self.station = client
+            self.label_statut.config(text="🟢 Connecté", fg='#27ae60')
+            messagebox.showinfo("Succès", f"Connecté à {ip}")
+            
+            # Rafraîchir l'affichage
+            self.rafraichir()
+            
+        except Exception as e:
+            messagebox.showerror("Erreur", f"Connexion échouée : {e}")
+    
+    def rafraichir(self):
+        """Lire et afficher l'état actuel"""
+        if self.station is None:
+            messagebox.showwarning("Attention", "Pas de connexion active")
+            return
+        
+        try:
+            # Lire capteurs
+            data_e4 = self.station.eb_read(4, 1)
+            data_e5 = self.station.eb_read(5, 1)
+            
+            # Mettre à jour affichage capteurs
+            for i in range(8):
+                bit_e4 = (data_e4[0] >> i) & 1
+                bit_e5 = (data_e5[0] >> i) & 1
+                
+                self.labels_capteurs[f'E4.{i}'].config(
+                    text="🟢" if bit_e4 else "⚪"
+                )
+                self.labels_capteurs[f'E5.{i}'].config(
+                    text="🟢" if bit_e5 else "⚪"
+                )
+            
+            # Lire actionneurs
+            data_a8 = self.station.ab_read(8, 1)
+            data_a9 = self.station.ab_read(9, 1)
+            
+            # Mettre à jour affichage actionneurs
+            for i in range(8):
+                bit_a8 = (data_a8[0] >> i) & 1
+                bit_a9 = (data_a9[0] >> i) & 1
+                
+                self.boutons_actionneurs[f'A8.{i}'].config(
+                    bg='#e74c3c' if bit_a8 else '#95a5a6'
+                )
+                self.boutons_actionneurs[f'A9.{i}'].config(
+                    bg='#e74c3c' if bit_a9 else '#95a5a6'
+                )
+        
+        except Exception as e:
+            messagebox.showerror("Erreur", f"Lecture échouée : {e}")
+    
