@@ -148,3 +148,114 @@ class InterfaceSupervision:
             label.grid(row=i+10, column=1, padx=10)
             self.labels_capteurs[f'E5.{i}'] = label
         
+        # COLONNE DROITE : ACTIONNEURS
+        frame_actionneurs = tk.LabelFrame(
+            frame_principal,
+            text="⚙️ ACTIONNEURS (Sorties)",
+            font=("Arial", 14, "bold"),
+            bg='#34495e',
+            fg='white',
+            padx=15,
+            pady=15
+        )
+        frame_actionneurs.grid(row=0, column=1, sticky='nsew', padx=5)
+        
+        self.boutons_actionneurs = {}
+        
+        # Actionneurs A8 (Z1-Z4)
+        tk.Label(
+            frame_actionneurs,
+            text="Groupe A8 (Z1-Z4)",
+            font=("Arial", 11, "bold"),
+            bg='#34495e',
+            fg='#e67e22'
+        ).grid(row=0, column=0, columnspan=2, pady=5)
+        
+        actionneurs_a8 = [
+            "Z1_ENTRER", "Z1_SORTIR", "Z2_ENTRER", "Z2_SORTIR",
+            "Z3_ENTRER", "Z3_SORTIR", "Z4_ENTRER", "Z4_SORTIR"
+        ]
+        
+        for i, nom in enumerate(actionneurs_a8):
+            btn = tk.Button(
+                frame_actionneurs,
+                text=f"A8.{i}\n{nom}",
+                font=("Arial", 9),
+                bg='#95a5a6',
+                fg='white',
+                width=15,
+                height=2,
+                command=lambda a=8, b=i: self.toggle_actionneur(a, b)
+            )
+            btn.grid(row=i+1, column=0, pady=3, padx=5)
+            self.boutons_actionneurs[f'A8.{i}'] = btn
+        
+        # Actionneurs A9 (Z5-Z8)
+        tk.Label(
+            frame_actionneurs,
+            text="Groupe A9 (Z5-Z8)",
+            font=("Arial", 11, "bold"),
+            bg='#34495e',
+            fg='#e67e22'
+        ).grid(row=9, column=0, columnspan=2, pady=5)
+        
+        actionneurs_a9 = [
+            "Z5_ENTRER", "Z5_SORTIR", "Z6_ENTRER", "Z6_SORTIR",
+            "Z7_ENTRER", "Z7_SORTIR", "Z8_ENTRER", "Z8_SORTIR"
+        ]
+        
+        for i, nom in enumerate(actionneurs_a9):
+            btn = tk.Button(
+                frame_actionneurs,
+                text=f"A9.{i}\n{nom}",
+                font=("Arial", 9),
+                bg='#95a5a6',
+                fg='white',
+                width=15,
+                height=2,
+                command=lambda a=9, b=i: self.toggle_actionneur(a, b)
+            )
+            btn.grid(row=i+10, column=0, pady=3, padx=5)
+            self.boutons_actionneurs[f'A9.{i}'] = btn
+        
+        # Configurer le redimensionnement
+        frame_principal.columnconfigure(0, weight=1)
+        frame_principal.columnconfigure(1, weight=1)
+        frame_principal.rowconfigure(0, weight=1)
+        
+        # Boutons de contrôle en bas
+        frame_controle = tk.Frame(self.fenetre, bg='#2c3e50')
+        frame_controle.pack(fill='x', padx=20, pady=10)
+        
+        self.btn_surveillance = tk.Button(
+            frame_controle,
+            text="▶️ DÉMARRER SURVEILLANCE",
+            font=("Arial", 12, "bold"),
+            bg='#3498db',
+            fg='white',
+            command=self.toggle_surveillance,
+            width=25
+        )
+        self.btn_surveillance.pack(side='left', padx=5)
+        
+        btn_rafraichir = tk.Button(
+            frame_controle,
+            text="🔄 RAFRAÎCHIR",
+            font=("Arial", 12, "bold"),
+            bg='#16a085',
+            fg='white',
+            command=self.rafraichir,
+            width=15
+        )
+        btn_rafraichir.pack(side='left', padx=5)
+        
+        btn_quitter = tk.Button(
+            frame_controle,
+            text="❌ QUITTER",
+            font=("Arial", 12, "bold"),
+            bg='#e74c3c',
+            fg='white',
+            command=self.quitter,
+            width=15
+        )
+        btn_quitter.pack(side='right', padx=5)
