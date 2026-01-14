@@ -320,3 +320,67 @@ class InterfaceSupervision:
         except Exception as e:
             messagebox.showerror("Erreur", f"Lecture échouée : {e}")
     
+    def toggle_actionneur(self, adresse, bit):
+        """Activer/désactiver un actionneur"""
+        if self.station is None:
+            messagebox.showwarning("Attention", "Pas de connexion active")
+            return
+        
+        try:
+            # Lire état actuel
+            data = self.station.ab_read(adresse, 1)
+            byte_actuel = data[0]
+            bit_actuel = (byte_actuel >> bit) & 1
+            
+            # Inverser
+            if bit_actuel:
+                nouveau_byte = byte_actuel & ~(1 << bit)
+            else:
+                nouveau_byte = byte_actuel | (1 << bit)
+            
+            # Écrire
+            self.station.ab_write(adresse, bytearray([nouveau_byte]))
+            
+            # Rafraîchir
+            self.rafraichir()
+            
+        except Exception as e:
+            messagebox.showerror("Erreur", f"Commande échouée : {e}")
+    
+    def toggle_surveillance(self):
+        """Démarrer/arrêter la surveillance continue"""
+        if self.surveillance_active:
+            self.surveillance_active = False
+            self.btn_surveillance.config(text="▶️ DÉMARRER SURVEILLANCE")
+        else:
+            self.surveillance_active = True
+            self.btn_surveillance.config(text="⏸️ ARRÊTER SURVEILLANCE")
+            
+            # Lancer thread de surveillance
+            thread = threading.Thread(target=self.surveillance_continue, daemon=True)
+            thread.start()
+    
+    def surveillance_continue(self):
+        """Boucle de surveillance"""
+        while self.surveillance_active:
+            self.rafraichir()
+            time.sleep(1)
+    
+    def quitter(self):
+        """Fermer l'application"""
+        self.surveillance_active = False
+        
+        if self.station:
+            self.station.disconnect()
+        
+        self.fenetre.destroy()
+    
+    def lancer(self):
+        """Démarrer l'interface"""
+        self.fenetre.mainloop()
+
+
+# Lancer l'application
+if __name__ == "__main__":
+    app = InterfaceSupervision()
+    app.lancer()
